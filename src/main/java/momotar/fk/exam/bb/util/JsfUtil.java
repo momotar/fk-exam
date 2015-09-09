@@ -1,4 +1,4 @@
-package momotar.fk.exam.cdi.util;
+package momotar.fk.exam.bb.util;
 
 import java.util.List;
 import javax.faces.application.FacesMessage;

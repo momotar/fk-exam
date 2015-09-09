@@ -1,9 +1,9 @@
 package momotar.fk.exam.cdi;
 
-import momotar.fk.exam.entity.Teams;
-import momotar.fk.exam.cdi.util.JsfUtil;
-import momotar.fk.exam.cdi.util.PaginationHelper;
-import momotar.fk.exam.ejb.TeamsFacade;
+import momotar.fk.exam.entity.Players;
+import momotar.fk.exam.bb.util.JsfUtil;
+import momotar.fk.exam.bb.util.PaginationHelper;
+import momotar.fk.exam.ejb.PlayersFacade;
 
 import java.io.Serializable;
 import java.util.List;
@@ -19,31 +19,31 @@ import javax.faces.model.DataModel;
 import javax.faces.model.ListDataModel;
 import javax.faces.model.SelectItem;
 
-@Named("teamsController")
+@Named("playersController")
 @SessionScoped  // 情報が残ってしまう不具合が少しあるが？
-public class TeamsController implements Serializable {
+public class PlayersController implements Serializable {
 
-    private Teams current;
+    private Players current;
     private DataModel items = null;
     @EJB
-    private momotar.fk.exam.ejb.TeamsFacade ejbFacade;
+    private momotar.fk.exam.ejb.PlayersFacade ejbFacade;
     private PaginationHelper pagination;
     private int selectedItemIndex;
     private final int CONFIG_MINIMUM_ID = 7;    //登録できる下限のIDを設定
     private final int ONE_PAGE_DATA_UNIT = 10; //1ページに表示させたいデータ件数を設定
 
-    public TeamsController() {
+    public PlayersController() {
     }
 
-    public Teams getSelected() {
+    public Players getSelected() {
         if (current == null) {
-            current = new Teams();
+            current = new Players();
             selectedItemIndex = -1;
         }
         return current;
     }
 
-    private TeamsFacade getFacade() {
+    private PlayersFacade getFacade() {
         return ejbFacade;
     }
 
@@ -71,13 +71,13 @@ public class TeamsController implements Serializable {
     }
 
     public String prepareView() {
-        current = (Teams) getItems().getRowData();
+        current = (Players) getItems().getRowData();
         selectedItemIndex = pagination.getPageFirstItem() + getItems().getRowIndex();
         return "View";
     }
 
     public String prepareCreate() {
-        current = new Teams();
+        current = new Players();
         selectedItemIndex = -1;
         return "Create";
     }
@@ -85,7 +85,7 @@ public class TeamsController implements Serializable {
     public String create() {
         try {
             getFacade().create(current);
-            JsfUtil.addSuccessMessage(ResourceBundle.getBundle("/Bundle").getString("TeamsCreated"));
+            JsfUtil.addSuccessMessage(ResourceBundle.getBundle("/Bundle").getString("PlayersCreated"));
             return prepareCreate();
         } catch (Exception e) {
             JsfUtil.addErrorMessage(e, ResourceBundle.getBundle("/Bundle").getString("PersistenceErrorOccured"));
@@ -94,7 +94,7 @@ public class TeamsController implements Serializable {
     }
 
     public String prepareEdit() {
-        current = (Teams) getItems().getRowData();
+        current = (Players) getItems().getRowData();
         selectedItemIndex = pagination.getPageFirstItem() + getItems().getRowIndex();
         return "Edit";
     }
@@ -102,7 +102,7 @@ public class TeamsController implements Serializable {
     public String update() {
         try {
             getFacade().edit(current);
-            JsfUtil.addSuccessMessage(ResourceBundle.getBundle("/Bundle").getString("TeamsUpdated"));
+            JsfUtil.addSuccessMessage(ResourceBundle.getBundle("/Bundle").getString("PlayersUpdated"));
             return "View";
         } catch (Exception e) {
             JsfUtil.addErrorMessage(e, ResourceBundle.getBundle("/Bundle").getString("PersistenceErrorOccured"));
@@ -111,7 +111,7 @@ public class TeamsController implements Serializable {
     }
 
     public String destroy() {
-        current = (Teams) getItems().getRowData();
+        current = (Players) getItems().getRowData();
         selectedItemIndex = pagination.getPageFirstItem() + getItems().getRowIndex();
         performDestroy();
         recreatePagination();
@@ -135,7 +135,7 @@ public class TeamsController implements Serializable {
     private void performDestroy() {
         try {
             getFacade().remove(current);
-            JsfUtil.addSuccessMessage(ResourceBundle.getBundle("/Bundle").getString("TeamsDeleted"));
+            JsfUtil.addSuccessMessage(ResourceBundle.getBundle("/Bundle").getString("PlayersDeleted"));
         } catch (Exception e) {
             JsfUtil.addErrorMessage(e, ResourceBundle.getBundle("/Bundle").getString("PersistenceErrorOccured"));
         }
@@ -191,34 +191,32 @@ public class TeamsController implements Serializable {
         return JsfUtil.getSelectItems(ejbFacade.findAll(), true);
     }
 
-    public Teams getTeams(java.lang.Integer id) {
+    public Players getPlayers(java.lang.Integer id) {
         return ejbFacade.find(id);
     }
     
-    
     public Integer getNextId() { //次に使うIDを取得する
-        List<Teams> allRecords =  ejbFacade.findAll();
+        List<Players> allRecords =  ejbFacade.findAll();
         if (allRecords.isEmpty()) {
             return CONFIG_MINIMUM_ID;
         } else {
-           // System.out.println(Bundle.ListPlayersTitle);
             int recordSize = allRecords.size() - 1;
             int nextId = allRecords.get(recordSize).getId() + 1;
             return nextId;
         }
     }
-
-    @FacesConverter(forClass = Teams.class)
-    public static class TeamsControllerConverter implements Converter {
+    
+    @FacesConverter(forClass = Players.class)
+    public static class PlayersControllerConverter implements Converter {
 
         @Override
         public Object getAsObject(FacesContext facesContext, UIComponent component, String value) {
             if (value == null || value.length() == 0) {
                 return null;
             }
-            TeamsController controller = (TeamsController) facesContext.getApplication().getELResolver().
-                    getValue(facesContext.getELContext(), null, "teamsController");
-            return controller.getTeams(getKey(value));
+            PlayersController controller = (PlayersController) facesContext.getApplication().getELResolver().
+                    getValue(facesContext.getELContext(), null, "playersController");
+            return controller.getPlayers(getKey(value));
         }
 
         java.lang.Integer getKey(String value) {
@@ -238,11 +236,11 @@ public class TeamsController implements Serializable {
             if (object == null) {
                 return null;
             }
-            if (object instanceof Teams) {
-                Teams o = (Teams) object;
+            if (object instanceof Players) {
+                Players o = (Players) object;
                 return getStringKey(o.getId());
             } else {
-                throw new IllegalArgumentException("object " + object + " is of type " + object.getClass().getName() + "; expected type: " + Teams.class.getName());
+                throw new IllegalArgumentException("object " + object + " is of type " + object.getClass().getName() + "; expected type: " + Players.class.getName());
             }
         }
 

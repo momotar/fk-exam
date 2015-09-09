@@ -1,4 +1,4 @@
-package momotar.fk.exam.cdi.util;
+package momotar.fk.exam.bb.util;
 
 import javax.faces.model.DataModel;
 
