@@ -1,4 +1,4 @@
-package momotar.fk.exam.cdi;
+package momotar.fk.exam.bb;
 
 import momotar.fk.exam.entity.Teams;
 import momotar.fk.exam.bb.util.JsfUtil;
